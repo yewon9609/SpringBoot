@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login페이지</title>
+</head>
+<body>
+<h1>login페이지</h1>
+<table border="1">
+
+
+    <!--타임리프 문법 : 자식요소에서 같은 객체를 접근하기 싫을때 부모요소에 붙여서 쓴다. -->
+    <!--부모요소에 th:object를 설정한 뒤 자식요소에서 *{}필드로 접근할 수 있다.-->
+
+    <form action="/ex/loginClear" method="post">
+    <input type="text" placeholder="아이디를 입력해주세요" name="userId">
+    <input type="password" placeholder="비밀번호를 입력해주세요" name="userPw">
+        <button type="submit"> 제출 </button>
+    </form>
+
+</table>
+</body>
+</html>

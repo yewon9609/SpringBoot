@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EX08</title>
+</head>
+<body>
+<h1>EX08</h1>
+<table border="1">
+    <!--// ex/ex08요청에 실행될 메소드 선언
+    // GET방식
+    // ex08.html선언
+    // 사용자가 전달한 점수의 총점과 평균 점수 출력-->
+    <tr>
+        <th>번호</th>
+        <th>국어</th>
+        <th>영어</th>
+        <th>수학</th>
+        <th>총점</th>
+        <th>평균점수</th>
+    </tr>
+    <!--타임리프 문법 : 자식요소에서 같은 객체를 접근하기 싫을때 부모요소에 붙여서 쓴다. -->
+    <!--부모요소에 th:object를 설정한 뒤 자식요소에서 *{}필드로 접근할 수 있다.-->
+
+
+    <tr th:object="${taskVO}">
+        <td th:text="*{kor}"></td>
+        <td th:text="*{eng}"></td>
+        <td th:text="**{math}"></td>
+        <td th:text="*{kor+eng+math}"></td>
+        <td th:text="*{(kor+eng+math)/3}"></td>
+
+    </tr>
+
+
+</table>
+</body>
+</html>
