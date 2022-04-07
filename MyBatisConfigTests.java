@@ -1,4 +1,4 @@
-package com.example.ex02.mybatis;
+package com.example.board.mybatis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
@@ -60,7 +60,3 @@ public class MyBatisConfigTests {
 
     }
 }
-
-
-
-
