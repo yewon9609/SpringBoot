@@ -1,4 +1,4 @@
-package com.example.ex01.mybatis;
+package com.example.board.mybatis;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @Configuration
 @RequiredArgsConstructor
-@MapperScan("com.example.ex01.mappers")
+@MapperScan("com.example.board.mapper")
 public class MyBatisConfig {
     //    커넥션 풀 및 MyBatis에 필요한 요소를 메모리에 할당 및 관리, xml과 java연동에 필요한 경로 관리
     private final ApplicationContext applicationContext;
@@ -38,29 +38,16 @@ public class MyBatisConfig {
     public SqlSessionFactory sqlSessionFactory() throws IOException {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean(); //세션 팩토리 설정 객체 생성
         sqlSessionFactoryBean.setDataSource(dataSource()); //위에서 설정한 datasource객체를 세션 팩토리 설정에 전달
-        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath*:/mappers/*.xml"));
+        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath*:/mapper/*.xml"));
+        sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:/config/config.xml"));
 
         try {
             SqlSessionFactory factory = sqlSessionFactoryBean.getObject();
-            factory.getConfiguration().setMapUnderscoreToCamelCase(true);   //언더바로 변수명 작성시 자동으로 카멜표기법으로 바꿔줌
+            factory.getConfiguration().setMapUnderscoreToCamelCase(true);
             return factory;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
