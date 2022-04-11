@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import com.example.board.domain.vo.BoardVO;
 import com.example.board.domain.vo.Criteria;
+import com.example.board.domain.vo.PageDTO;
 import com.example.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class BoardController {
         log.info("list");
         log.info("---------------------------");
         model.addAttribute("list", boardService.getList(criteria));
+        model.addAttribute("pageDTO", new PageDTO(criteria, boardService.getTotal()));
     }
     @GetMapping("/register") public void register(){}
 
