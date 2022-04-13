@@ -3,6 +3,7 @@
 <configuration>
     <typeAliases>
         <typeAlias type="com.example.board.domain.vo.BoardVO" alias="boardVO"/>
+        <typeAlias type="com.example.board.domain.vo.ReplyVO" alias="replyVO"/>
 
     </typeAliases>
 </configuration>
