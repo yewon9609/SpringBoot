@@ -36,6 +36,41 @@
             .updateDate {display: none;}
             .big-width {display: none;}
             .small-width {display: block;}
+            h3.lnb {
+                display: block;
+                position: relative;
+            }
+
+            div.register-wrap {
+                position: absolute;
+                top: 87px;
+                width: 100%;
+            }
+
+            div.register-wrap a {
+                width: 100%;
+                font-size: 1.2rem !important;
+            }
+
+            div.fields {
+                position: absolute;
+                width: 100%;
+            }
+
+            div.field div input[name='keyword'] {
+                width: 82.4%;
+            }
+
+            div.field div a.button.small {
+                width: 18%;
+                line-height: 3.6;
+                margin-left: -5px;
+            }
+
+            div.table-wrapper {
+                margin-top: 178px;
+            }
+
         }
     </style>
 </head>
@@ -52,24 +87,24 @@
             </header>
             <!-- Table -->
             <h3 class="lnb">
-                <div style="line-height: 3;">
+                <div class="register-wrap" style="line-height: 3;">
                     <a href="/board/register" class="button small">글 등록</a>
                 </div>
                 <div class="fields">
                     <form name="searchForm" action="/board/list">
-                        <div class="field">
-                            <select name="type">
+                        <div class="field" th:object="${pageDTO}">
+                            <select name="type" th:object="${criteria}">
                                 <option value="">검색 기준</option>
-                                <option value="C">내용</option>
-                                <option value="T">제목</option>
-                                <option value="W">작성자</option>
-                                <option value="TC">제목 또는 내용</option>
-                                <option value="CW">내용 또는 작성자</option>
-                                <option value="TW">제목 또는 작성자</option>
-                                <option value="TCW">제목 또는 작성자 또는 내용</option>
+                                <option value="C" th:selected="*{type}=='C'">내용</option>
+                                <option value="T" th:selected="*{type}=='T'">제목</option>
+                                <option value="W" th:selected="*{type}=='W'">작성자</option>
+                                <option value="TC" th:selected="*{type}=='TC'">제목 또는 내용</option>
+                                <option value="CW" th:selected="*{type}=='CW'">내용 또는 작성자</option>
+                                <option value="TW" th:selected="*{type}=='TW'">제목 또는 작성자</option>
+                                <option value="TCW" th:selected="*{type}=='TCW'">제목 또는 작성자 또는 내용</option>
                             </select>
-                            <div>
-                                <input type="text" name="keyword">
+                            <div th:object="${criteria}">
+                                <input type="text" name="keyword" th:value="*{keyword}">
                                 <a href="javascript:goSearch()" class="button small icon solid fa-search"></a>
                             </div>
                         </div>
@@ -134,6 +169,8 @@
                     <form action="/board/list" th:object="${criteria}" name="pageForm">
                         <input type="hidden" th:field="*{pageNum}">
                         <input type="hidden" th:field="*{amount}">
+                        <input type="hidden" th:field="*{type}">
+                        <input type="hidden" th:field="*{keyword}">
                     </form>
                 </div>
             </div>

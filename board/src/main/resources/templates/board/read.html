@@ -13,6 +13,14 @@
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     <link rel="stylesheet" href="/css/main.css" />
+    <style>
+        .line{
+            border-bottom: 1px solid #ff8b77;
+        }
+        p {
+            margin: 0;
+        }
+    </style>
 </head>
 <body class="is-preload">
 <!-- Main -->
@@ -32,6 +40,8 @@
                     <form action="/board/remove" th:object="${board}">
                         <input type="hidden" th:field="${criteria.pageNum}">
                         <input type="hidden" th:field="${criteria.amount}">
+                        <input type="hidden" th:field="${criteria.type}">
+                        <input type="hidden" th:field="${criteria.keyword}">
                         <div class="fields">
                             <div class="field">
                                 <h4>번호</h4>
@@ -56,6 +66,43 @@
                                 <input type="submit" class="button" value="삭제"/>
                             </li>
                         </ul>
+
+                        <!--댓글--------------------------------------------------------------------------------------------- -->
+                        <ul class="icons">
+                            <li style="display: block">
+                                <span class="icon solid fa-envelope"></span>
+                                <strong>댓글</strong>
+                            </li>
+                        </ul>
+                        <a href="javascript:void(0)" class="register button primary small" style="width: 100%">댓글 등록</a>
+                        <div style="display: none" class="register-form">
+                            <div>
+                                <h4>작성자</h4>
+                                <input type="text" name="replier" placeholder="Replier">
+                            </div>
+                            <div>
+                                <h4>댓글</h4>
+                                <textarea rows="6" name="reply" placeholder="Reply" style="resize: none"></textarea>
+                            </div>
+                            <div style="text-align: right">
+                                <a href="javascript:void(0)" class="finish button primary small">등록</a>
+                                <a href="javascript:void(0)" class="cancel button primary small">취소</a>
+                            </div>
+                        </div>
+                        <ul class="replies"></ul>
+
+                    <!--댓글 페이징 처리-->
+                      <!--  <div>
+                        <th:block th:each="num:${#numbers.sequence(pageDTO.getStartPage(), pageDTO.getEndPage())}">
+                            <code th:if="${pageDTO.criteria.getPageNum() == num}" th:text="${num}"></code>
+                            <a class="changePage" th:unless="${pageDTO.criteria.getPageNum() == num}" th:href="${num}">
+                                <code th:text="${num}"></code>
+                            </a>
+                        </th:block>
+                        </div>-->
+
+
+
                     </form>
                 </div>
             </div>
@@ -69,8 +116,88 @@
 <script src="/js/breakpoints.min.js"></script>
 <script src="/js/util.js"></script>
 <script src="/js/main.js"></script>
+<script src="/js/reply.js"></script>
+</body>
 <script th:inline="javascript">
     let pageInfo = [[${criteria.listLink}]];
+    let bno = [[${board.bno}]];
+    const $replyUL = $("ul.replies");
+    showList(1);
+
+
+    function showList(page) {
+        replyService.getList({
+            bno:bno, page:page || 1
+        }, function(list){
+            let str ="";
+
+            if(list==null || list.length ==0){
+                $replyUL.html("");
+                return;
+            }
+
+            $.each(list,function(index, item){
+                str +="<li style='display: block' data-rno='"+item.rno+"'>";
+                str +="<strong>"+item.replier+"</strong>";
+                str +="<div style='display: flex; justify-content: space-between;' >";
+                str +="<p>"+item.reply+"</p>";
+                str +="<p><strong class='date'>2022-04-14 15:16</strong></p>";
+                str +="</div>";
+                str +="<div class='line'></div>";
+                str +="</li>";
+            });
+            $replyUL.html(str);
+        });
+    }
+
+    //댓글 등록 ------------------------------------------------------------------------------------------
+    $("a.finish").click(function(e){
+        e.preventDefault();
+        let $replier = $("input[name=replier]").val();
+        console.log($replier);
+        let $reply = $("textarea[name=reply]").val();
+        console.log($reply);
+        let $bno = bno;
+        replyService.add({replier:$replier, reply:$reply, bno:bno},function(result){
+               console.log("RESULT: " + result);
+                    $("input[name=replier]").val("");
+            $("textarea[name=reply]").val("");
+                    showList();
+             });
+
+
+
+    })
+
+    //페이징 처리
+    //replyCount 댓글 총 갯수
+    function showReplyPage(replyCount){
+        let endNum = Math.ceil(pageNum / 10.0) * 10;
+        let startNum = endNum - 9;
+        let realEnd = Math.ceil(replyCount / 10.0);
+        let prev = startNum != 1;
+        let next = endNum * 10 < replyCount;
+
+
+        if(matchMedia("screen and (max-width:918px)").matches){ //918px 미만일 때
+
+        }
+    }
+
+
+
+    $("a.register").click(function(e){
+        e.preventDefault();
+        $("div.register-form").show();
+        $(this).hide();
+    })
+
+    $("a.cancel").click(function(e){
+        e.preventDefault();
+        $("div.register-form").hide();
+        $("a.register").show();
+    })
+
 
     function goUpdate(){
         let bno = [[${board.bno}]];
@@ -80,6 +207,45 @@
     function goList(){
         location.href = "/board/list" + pageInfo;
     }
+
+    $(document).ready(function(){
+        // console.log(replyService.name);
+
+        // replyService.add({
+        //     reply: "JS Test", replier:"test", bno: bno
+        // }, function(result){
+        //     alert("RESULT: " + result);
+        // });
+
+        // replyService.getList({bno: bno}, function(list){
+        //     console.log(list);
+        // })
+
+        // replyService.read(41, function(result){
+        //     console.log(result);
+        // });
+
+        // replyService.remove(1, function(result){
+        //     alert("RESULT : " + result);
+        // });
+
+        // replyService.modify({
+        //     rno: 13, reply: "수정 모듈 테스트"
+        // }, function(result){
+        //     alert("RESULT : " + result);
+        // });
+
+    });
 </script>
-</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
