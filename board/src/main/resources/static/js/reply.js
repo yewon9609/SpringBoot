@@ -7,7 +7,7 @@
 *   복잡하게 섞여서 유지보수가 힘들다. 따라서 Javascript를 하나의 모듈처럼 구성하여 사용한다.
 *
 * */
-console.log("Reply Modules.......");
+// console.log("Reply Modules.......");
 
 let replyService = (function(){
 
@@ -17,7 +17,6 @@ let replyService = (function(){
         $.ajax({
             type: "POST",
             url: "/replies/new",
-            //  json 객체를 String 객체로 변환
             data: JSON.stringify(reply),
             contentType: "application/json; charset=utf-8",
             success: function(result, status, xhr){
@@ -38,9 +37,9 @@ let replyService = (function(){
         let bno = param.bno;
         let page = param.page || 1;
 
-        $.getJSON("/replies/list/" + bno + "/" + page, function(list){
+        $.getJSON("/replies/list/" + bno + "/" + page, function(replyPageDTO){
             if(callback){
-                callback(list);
+                callback(replyPageDTO.replyCount, replyPageDTO.list);
             }
         }).fail(function(xhr, status, er){
             if(error){
@@ -95,5 +94,65 @@ let replyService = (function(){
         });
     }
 
-    return {add: add, getList: getList, read: read, remove: remove}
+    //댓글 수정
+    function modify(reply, callback, error){
+        $.ajax({
+            type: "PATCH",
+            url: "/replies/" + reply.rno,
+            data: JSON.stringify(reply),
+            contentType: "application/json; charset=utf-8",
+            success: function(result){
+                if(callback){
+                    callback(result);
+                }
+            },
+            error: function(xhr, status, er){
+                if(error){
+                    error(er);
+                }
+            }
+        });
+    }
+
+    //댓글 작성 시간(Controller)
+    function getReplyDateByController(replyDate, callback, error){
+        $.ajax({
+            type: "GET",
+            url: "/time",
+            data: {replyDate : replyDate},
+            success: function(date){
+                if(callback){
+                    callback(date);
+                }
+            },
+            error: function(xhr, status, er){
+                if(error){
+                    error(er);
+                }
+            }
+        });
+    }
+
+    //댓글 작성 시간(Javascript)
+    function getReplyDateByJavascript(replyDate){
+        let today = new Date();
+        let rDate = new Date(replyDate);
+        let gap = today.getTime() - rDate.getTime();
+
+        if(gap < 1000 * 60 * 60 * 24){
+            let h = rDate.getHours();
+            let mm = rDate.getMinutes();
+            let s = rDate.getSeconds();
+
+            return [(h < 10 ? '0' : '') + h, ':', (mm < 10 ? '0' : '') + mm, ':', (s < 10 ? '0' : '') + s].join("");
+        }else{
+            let y = rDate.getFullYear();
+            let m = rDate.getMonth() + 1;
+            let d = rDate.getDate();
+
+            return [y, '-', (m < 10 ? '0' : '') + m, '-', (d < 10 ? '0' : '') + d].join("");
+        }
+    }
+
+    return {add: add, getList: getList, read: read, remove: remove, modify: modify, getReplyDateByController: getReplyDateByController, getReplyDateByJavascript: getReplyDateByJavascript}
 })();
