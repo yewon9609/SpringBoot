@@ -66,8 +66,6 @@
                                 <input type="submit" class="button" value="삭제"/>
                             </li>
                         </ul>
-
-                        <!--댓글--------------------------------------------------------------------------------------------- -->
                         <ul class="icons">
                             <li style="display: block">
                                 <span class="icon solid fa-envelope"></span>
@@ -90,20 +88,8 @@
                             </div>
                         </div>
                         <ul class="replies"></ul>
-
-                    <!--댓글 페이징 처리-->
-                      <!--  <div>
-                        <th:block th:each="num:${#numbers.sequence(pageDTO.getStartPage(), pageDTO.getEndPage())}">
-                            <code th:if="${pageDTO.criteria.getPageNum() == num}" th:text="${num}"></code>
-                            <a class="changePage" th:unless="${pageDTO.criteria.getPageNum() == num}" th:href="${num}">
-                                <code th:text="${num}"></code>
-                            </a>
-                        </th:block>
-                        </div>-->
-
-
-
                     </form>
+                    <div class="paging" style="text-align: center"></div>
                 </div>
             </div>
         </div>
@@ -121,83 +107,178 @@
 <script th:inline="javascript">
     let pageInfo = [[${criteria.listLink}]];
     let bno = [[${board.bno}]];
+    let pageNum = 1;
+
     const $replyUL = $("ul.replies");
-    showList(1);
 
+    showList(pageNum);
 
-    function showList(page) {
+    function showList(page){
         replyService.getList({
-            bno:bno, page:page || 1
-        }, function(list){
-            let str ="";
+            bno: bno, page: page || 1
+        }, function(replyCount, list){
+            let str = "";
 
-            if(list==null || list.length ==0){
-                $replyUL.html("");
+            if(list == null || list.length == 0){
+                $replyUL.html("<p>등록된 댓글이 없습니다.</p>");
                 return;
             }
 
-            $.each(list,function(index, item){
-                str +="<li style='display: block' data-rno='"+item.rno+"'>";
-                str +="<strong>"+item.replier+"</strong>";
-                str +="<div style='display: flex; justify-content: space-between;' >";
-                str +="<p>"+item.reply+"</p>";
-                str +="<p><strong class='date'>2022-04-14 15:16</strong></p>";
-                str +="</div>";
-                str +="<div class='line'></div>";
-                str +="</li>";
+            // for(let i=0; i<list.length; i++){ //댓글 목록 개수만큼 반복
+            //     str += "<li style='display: block' data-rno='" + list[i].rno + "'>";
+            //     str += "<strong>" + list[i].replier + "</strong>";
+            //     str += "<div style='display: flex; justify-content: space-between'>";
+            //     str += "<p>" + list[i].reply + "</p>";
+            //     str += "<p><strong class='date'></strong></p>";
+            //     str += "</div>";
+            //     str += "<div class='line'></div>";
+            //     str += "</li>";
+            //     //댓글을 작성한 시간을 모듈에 전달하여, 알맞는 날짜 혹은 시간을 가져온다.
+            //     replyService.getReplyDateByController(list[i].replyDate, function(date){
+            //         //가져온 날짜 혹은 시간을 알맞는 곳에 뿌려준다.
+            //         $("strong.date")[i].innerHTML = date;
+            //     });
+            // }
+
+
+            // modify : 수정
+            // finish : 수정완료
+            // remove : 삭제
+            $.each(list, function(index, item){
+                str += "<li style='display: block' data-rno='" + item.rno + "'>";
+                str += "<div style='display: flex; justify-content: space-between;'>";
+                str += "<strong style='display:block;'>" + item.replier + "</strong>";
+                str += "<div>";
+                str += "<a class='modify " + item.rno + "' style='cursor: pointer;'>수정</a>"
+                str += "<a class='finish " + item.rno + "' style='display: none; cursor: pointer;'>수정완료</a>"
+                str += "&nbsp;&nbsp;<a href='' class='remove'>삭제</a>"
+                str += "</div>";
+                str += "</div>";
+                str += "<div style='display: flex; justify-content: space-between'>";
+                str += "<p class='reply " + item.rno + "'>" + item.reply + "</p>";
+                str += "<p style='text-align: right;'><strong class='date'>작성된 날짜 ";
+                str += replyService.getReplyDateByJavascript(item.replyDate)
+                if(item.replyDate != item.updateDate){
+                    str += "<br>수정된 날짜 " + replyService.getReplyDateByJavascript(item.updateDate);
+                }
+                str += "</strong></p>";
+                str += "</div>";
+                str += "<div class='line'></div>";
+                str += "</li>";
             });
             $replyUL.html(str);
+            showReplyPage(replyCount);
         });
     }
 
-    //댓글 등록 ------------------------------------------------------------------------------------------
-    $("a.finish").click(function(e){
+    $(".replies").on("click", "a.modify", function(e){
         e.preventDefault();
-        let $replier = $("input[name=replier]").val();
-        console.log($replier);
-        let $reply = $("textarea[name=reply]").val();
-        console.log($reply);
-        let $bno = bno;
-        replyService.add({replier:$replier, reply:$reply, bno:bno},function(result){
-               console.log("RESULT: " + result);
-                    $("input[name=replier]").val("");
-            $("textarea[name=reply]").val("");
-                    showList();
-             });
+        let str = "";
 
+        $("a." + this.classList[1]).show();
+        $(this).hide();
+        str = "<textarea style='resize: none;' class='" + this.classList[1] + "'>";
+        str += $("p." + this.classList[1]).text();
+        str += "</textarea>";
+        $("p." + this.classList[1]).html(str);
+        $("p." + this.classList[1]).css("width", "83%");
+    });
 
+    // $(".replies").on("click", "a", function(e){
+    //     e.preventDefault();
+    //     if($(this).text() == "수정"){
+    //         $(this).hide();
+    //         $(".finish" + $(this).attr("href")).show();
+    //     }
+    // });
+
+    // 수정 버튼을 누르면 수정이 없어지고, 수정 완료가 나타난다.
+    // p태그는 textarea태그로 변경되어야 한다.
+
+    // 댓글 등록
+    $(".finish").on("click", function(e){
+        e.preventDefault();
+        let replier = $("input[name='replier']").val();
+        let reply = $("textarea[name='reply']").val();
+
+        if(!replier || !reply) {return;}
+
+        replyService.add({
+            bno: bno, reply: reply, replier: replier
+        }, function(result){
+            alert(result);
+            $("input[name='replier']").val("");
+            $("textarea[name='reply']").val("");
+            $("div.register-form").hide();
+            $("a.register").show();
+            showList(pageNum);
+        })
 
     })
 
-    //페이징 처리
-    //replyCount 댓글 총 갯수
+    // 페이징 처리
     function showReplyPage(replyCount){
         let endNum = Math.ceil(pageNum / 10.0) * 10;
         let startNum = endNum - 9;
         let realEnd = Math.ceil(replyCount / 10.0);
-        let prev = startNum != 1;
+        let str = "";
+        const $pagingTag = $("div.paging");
+
+        if(endNum > realEnd) {
+            endNum = realEnd;
+        }
+
+        let prev = startNum > 1;
         let next = endNum * 10 < replyCount;
 
-
         if(matchMedia("screen and (max-width:918px)").matches){ //918px 미만일 때
+            if(pageNum > 1){
+                str += "<a class='changePage' href='" + (pageNum - 1) + "'><code>&lt;</code></a>"
+            }
+            str += "<code>" + pageNum + "</code>";
+            if(pageNum < realEnd){
+                str += "<a class='changePage' href='" + (pageNum + 1) + "'><code>&gt;</code></a>"
+            }
 
+        }else{ //918px 이상일 때
+            if(prev){
+                str += "<a class='changePage' href='" + (startNum - 1) + "'><code>&lt;</code></a>"
+            }
+            for(let i=startNum; i<=endNum; i++){
+                if(pageNum == i){
+                    str += "<code>" + i + "</code>";
+                    continue;
+                }
+                str += "<a class='changePage' href='" + i + "'><code>" + i + "</code></a>";
+            }
+            if(next){
+                str += "<a class='changePage' href='" + (endNum + 1) + "'><code>&gt;</code></a>"
+            }
         }
+        $pagingTag.html(str);
     }
 
-
+    // 이벤트 위임
+    // 기존 문서에 작성되지 않은 html코드에 이벤트를 줄 때에는,
+    // 컴파일 순서 상 dom으로 작성한 코드가 더 늦게 실행되기 때문에,
+    // 기존 문서에 작성된 html코드에 이벤트를 주고, 그 안에 추가될 자식 요소에 이벤트를 전달하는 형식으로 개발한다.
+    $(".paging").on("click", "a.changePage", function(e){
+        e.preventDefault();
+        pageNum = $(this).attr("href");
+        showList(pageNum);
+    });
 
     $("a.register").click(function(e){
         e.preventDefault();
         $("div.register-form").show();
         $(this).hide();
-    })
+    });
 
     $("a.cancel").click(function(e){
         e.preventDefault();
         $("div.register-form").hide();
         $("a.register").show();
-    })
-
+    });
 
     function goUpdate(){
         let bno = [[${board.bno}]];

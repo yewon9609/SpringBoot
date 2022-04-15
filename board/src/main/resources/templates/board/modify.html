@@ -26,14 +26,16 @@
                     <form method="post" action="/board/modify" th:object="${board}">
                         <input type="hidden" th:field="${criteria.pageNum}">
                         <input type="hidden" th:field="${criteria.amount}">
+                        <input type="hidden" th:field="${criteria.type}">
+                        <input type="hidden" th:field="${criteria.keyword}">
                         <div class="fields">
                             <div class="field">
                                 <h4>번호</h4>
-                                <input th:field="*{bno}" type="text" readonly/>
+                                <input type="text" th:field="*{bno}" readonly/>
                             </div>
                             <div class="field">
                                 <h4>*제목</h4>
-                                <input  th:field="*{title}" type="text"/>
+                                <input type="text" th:field="*{title}"/>
                             </div>
                             <div class="field">
                                 <h4>*내용</h4>
@@ -41,7 +43,7 @@
                             </div>
                             <div class="field">
                                 <h4>작성자</h4>
-                                <input  type="text" th:value="*{writer}" readonly/>
+                                <input name="writer" type="text" th:value="*{writer}" readonly/>
                             </div>
                         </div>
                         <ul class="actions special">
@@ -62,15 +64,12 @@
 <script src="/js/breakpoints.min.js"></script>
 <script src="/js/util.js"></script>
 <script src="/js/main.js"></script>
+</body>
 <script th:inline="javascript">
-
     let pageInfo = [[${criteria.listLink}]];
 
     function goList(){
-        location.href="/board/list"+pageInfo;
+        location.href = "/board/list" + pageInfo;
     }
-
-
 </script>
-</body>
 </html>
