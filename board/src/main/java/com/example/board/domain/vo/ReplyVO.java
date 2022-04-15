@@ -6,15 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class ReplyVO {
-   private Long rno;
-   private Long bno;
-   private String reply;
-   private String replier;
-   private String replyDate;
-   private String updateDate;
-
-
-
-
-
+    private Long rno;
+    private Long bno;
+    private String reply;
+    private String replier;
+    private String replyDate;
+    private String updateDate;
 }
