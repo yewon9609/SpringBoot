@@ -151,7 +151,7 @@
                 str += "<div>";
                 str += "<a class='modify " + item.rno + "' style='cursor: pointer;'>수정</a>"
                 str += "<a class='finish " + item.rno + "' style='display: none; cursor: pointer;'>수정완료</a>"
-                str += "&nbsp;&nbsp;<a href='' class='remove'>삭제</a>"
+                str += "&nbsp;&nbsp;<a class='remove' href='" + item.rno + "'>삭제</a>"
                 str += "</div>";
                 str += "</div>";
                 str += "<div style='display: flex; justify-content: space-between'>";
@@ -171,8 +171,21 @@
         });
     }
 
+    //댓글 삭제
+    $(".replies").on("click", "a.remove", function(e){
+        e.preventDefault();
+        let rno = $(this).attr("href");
+        replyService.remove(rno, function(result){
+            alert(result);
+            showList(pageNum);
+        })
+    })
+
+    let check = false;
+
     $(".replies").on("click", "a.modify", function(e){
         e.preventDefault();
+        if(check) {alert("수정중인 댓글이 있습니다."); return;}
         let str = "";
 
         $("a." + this.classList[1]).show();
@@ -182,6 +195,24 @@
         str += "</textarea>";
         $("p." + this.classList[1]).html(str);
         $("p." + this.classList[1]).css("width", "83%");
+        check = true;
+    });
+
+    $(".replies").on("click", "a.finish", function(e){
+        //let rno = $(this).closest("li").data("rno")
+        let rno = this.classList[1];
+        let reply = $("textarea." + rno).val();
+
+        if(!reply){alert("댓글의 내용을 입력해주세요."); return;}
+
+        replyService.modify({
+            rno: rno, reply: reply
+        }, function(result){
+            alert(result);
+            showList(pageNum);
+            check = false;
+        });
+
     });
 
     // $(".replies").on("click", "a", function(e){
