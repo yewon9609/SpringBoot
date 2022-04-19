@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class AttachFileVO {
-   private String fileName;
-   private String uploadPath;   //파일 경로
-   private String uuid;
-   private boolean image;       //이미지인지 아닌지
-
+    private String fileName;
+    private String uploadPath;
+    private String uuid;
+    private boolean image;
 }

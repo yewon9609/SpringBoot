@@ -1,15 +1,16 @@
 /*
- * 문제점
- *   1. 동일한 이름으로 파일이 업로드 되었을 때 기존 파일이 사라지는 문제
- *   2. 이미지 파일의 경우 원본 파일의 용량이 큰 경우 썸네일 이미지를 생성해야 하는 문제
- *   3. 이미지 파일과 일반 파일을 구분해서 다운로드 혹은 페이지에서 조회하도록 처리하는 문제
- *   4. 첨부파일 공격에 대비하기 위한 업로드 파일의 확장자 제한
- * */
+* 문제점
+*   1. 동일한 이름으로 파일이 업로드 되었을 때 기존 파일이 사라지는 문제
+*   2. 이미지 파일의 경우 원본 파일의 용량이 큰 경우 썸네일 이미지를 생성해야 하는 문제
+*   3. 이미지 파일과 일반 파일을 구분해서 다운로드 혹은 페이지에서 조회하도록 처리하는 문제
+*   4. 첨부파일 공격에 대비하기 위한 업로드 파일의 확장자 제한
+* */
 package com.example.ex03.controller;
 
 import com.example.ex03.domain.vo.AttachFileVO;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnailator;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -52,7 +53,7 @@ public class UploadController {
             log.info("-------------------------");
             log.info("Upload File Name : " + file.getOriginalFilename());
             log.info("Upload File Size : " + file.getSize());
-
+            
             //저장할 경로와 파일의 이름을 File객체에 담는다.
             File saveFile = new File(uploadFolder, file.getOriginalFilename());
 
@@ -123,31 +124,28 @@ public class UploadController {
         }
         return fileList;
     }
-    @GetMapping(value = "/display", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
+
+//    @GetMapping("/display")
+//    @ResponseBody
+//    public ResponseEntity<byte[]> getFile(String fileName){
+//        File file = new File("C:/upload/" + fileName);
+//        HttpHeaders header = new HttpHeaders();
+//        ResponseEntity<byte[]> result = null;
+//        try {
+////            헤더에 적절한 파일의 타입을 probeContentType을 통해서 포함시킨다.
+////            png파일이면 image/png, jpeg파일이면 image/jpeg 타입으로 포함시킨다.
+//            header.add("Content-Type", Files.probeContentType(file.toPath()));
+//            result = new ResponseEntity<byte[]>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
+    @GetMapping("/display")
     @ResponseBody
     public byte[] getFile(String fileName) throws IOException{
         return FileCopyUtils.copyToByteArray(new File("C:/upload/" + fileName));
     }
-
- /*   @GetMapping("/display")
-    @ResponseBody
-    public ResponseEntity<byte[]> getFile(String fileName){
-        File file = new File("C:/upload/" + fileName);
-        HttpHeaders header = new HttpHeaders();
-        ResponseEntity<byte[]> result = null;
-        try {
-//            헤더에 적절한 파일의 타입을 probeContentType을 통해서 포함시킨다.
-//            png파일이면 image/png, jpeg파일이면 image/jpeg 타입으로 포함시킨다.
-            header.add("Content-Type", Files.probeContentType(file.toPath()));
-            result = new ResponseEntity<byte[]>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }*/
-
-
-
 
     @GetMapping("/download")
     @ResponseBody
@@ -169,16 +167,14 @@ public class UploadController {
     @PostMapping("/deleteFile")
     @ResponseBody
     public String deleteFile(String fileName, String type){
-        File file =new File("C:/upload/"+fileName);
+        File file = new File("C:/upload/" + fileName);
         file.delete();
         if(type.equals("image")){
-            file = new File (file.getPath().replace("s_", ""));
+            file = new File(file.getPath().replace("s_", ""));
             file.delete();
-
         }
         return "deleted";
     }
-
 
     private String getPath(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -197,6 +193,7 @@ public class UploadController {
         return false;
     }
 }
+
 
 
 
