@@ -1,5 +1,6 @@
 package com.example.board.service;
 
+import com.example.board.domain.dao.BoardDAO;
 import com.example.board.domain.dao.ReplyDAO;
 import com.example.board.domain.vo.Criteria;
 import com.example.board.domain.vo.ReplyVO;
@@ -12,13 +13,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReplyServiceImpl implements ReplyService{
+public class ReplyServiceImpl implements ReplyService {
 
     private final ReplyDAO replyDAO;
+    private final BoardDAO boardDAO;
 
     @Override
     public boolean register(ReplyVO replyVO) {
         log.info("reply register......." + replyVO);
+        boardDAO.updateReplyCount(replyVO.getBno(), 1);
         return replyDAO.register(replyVO) == 1;
     }
 
@@ -31,6 +34,7 @@ public class ReplyServiceImpl implements ReplyService{
     @Override
     public boolean remove(Long rno) {
         log.info("reply remove........." + rno);
+        boardDAO.updateReplyCount(replyDAO.read(rno).getBno(), -1);
         return replyDAO.remove(rno) == 1;
     }
 

@@ -17,6 +17,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 /*
 *   Task        URL             Method          Parameter       Form        URL이동
@@ -29,7 +33,7 @@ import java.util.List;
 
 @Controller
 @Slf4j
-@RequiredArgsConstructor /*nonNull이랑 final붙은 애들한테만 생성자 주입*/
+@RequiredArgsConstructor
 @RequestMapping("/board/*")
 public class BoardController {
     private final BoardService boardService;
@@ -86,8 +90,9 @@ public class BoardController {
         log.info("---------------------------");
         log.info("remove, " + bno);
         log.info("---------------------------");
-
+//        List<AttachVO> attachVOList = boardService.getList(bno);
         if(boardService.remove(bno)){
+//            deleteFiles(attachVOList);
             result = "success";
         }else {
             result = "failure";
@@ -123,6 +128,26 @@ public class BoardController {
     public List<AttachVO> getAttachList(Long bno){
         log.info("getAttachList : " + bno);
         return boardService.getList(bno);
+    }
+
+    private void deleteFiles(List<AttachVO> attachVOList){
+        log.info("delete attach files.........");
+        log.info(attachVOList.toString());
+
+        if(attachVOList == null){return;}
+        attachVOList.forEach(attach -> {
+            try {
+                Path file = Paths.get("C:/upload/" + attach.getUploadPath() + "/" + attach.getUuid() + "_" + attach.getFileName());
+                Files.delete(file);
+                if(Files.probeContentType(file).startsWith("image")){
+                    file = Paths.get("C:/upload/" + attach.getUploadPath() + "/s_" + attach.getUuid() + "_" + attach.getFileName());
+                    Files.delete(file);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 }
 

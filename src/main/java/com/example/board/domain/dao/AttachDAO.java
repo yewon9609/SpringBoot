@@ -17,10 +17,18 @@ public class AttachDAO {
     }
 
     public void remove(String uuid){
+        if(uuid == null) {return;}
         attachMapper.delete(uuid);
     }
 
     public List<AttachVO> selectAllByBno(Long bno){
         return attachMapper.select(bno);
     }
+
+    public String getUUID(Long bno) { return attachMapper.getUUID(bno); }
+
+    public List<AttachVO> getOldFiles(){return attachMapper.getOldFiles();}
+
+
+
 }

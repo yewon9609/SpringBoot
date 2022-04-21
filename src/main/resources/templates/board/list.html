@@ -127,7 +127,7 @@
                     <th:block th:each="board:${list}">
                         <tr class="tBody" th:object="${board}">
                             <td class="bno" th:text="*{bno}"></td>
-                            <td class="title"><a class="goRead" th:text="*{title}" th:href="*{bno}"></a></td>
+                            <td class="title"><a class="goRead" th:text="*{title}" th:href="*{bno}"></a><th:block th:text="'['+*{replyCount}+']'"></th:block></td>
                             <td class="writer" th:text="*{writer}"></td>
                             <td class="regDate" th:text="*{regdate}"></td>
                             <td class="updateDate" th:text="*{updateDate}"></td>
@@ -207,7 +207,7 @@
         $(pageForm).find("input[name='pageNum']").val($(this).attr("href"));
         $(pageForm).submit();
     });
-
+~
     function goSearch(){
         let $form = $(searchForm);
         if(!$form.find("option:selected").val()){

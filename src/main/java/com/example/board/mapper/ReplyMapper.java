@@ -3,7 +3,6 @@ package com.example.board.mapper;
 import com.example.board.domain.vo.Criteria;
 import com.example.board.domain.vo.ReplyVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
